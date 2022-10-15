@@ -1,10 +1,10 @@
 
-from typing import Any
 from math import sin
-import tornado.web
+from typing import Any
 
-from plotly.io import to_json
+import tornado.web
 from plotly import graph_objs
+from plotly.io import to_json
 
 
 class MainHandler(tornado.web.RequestHandler):

@@ -8,11 +8,10 @@ from camera import (
     FrameHandlers,
     WebSocketCameraWrapper,
 )
-from sockets import BaseWebSocket
+from models import create_model
 from request_handlers import MainHandler
+from sockets import BaseWebSocket
 from utils import Periodic
-
-from main import create_model
 
 FRAMES_PER_SECOND = 60
 

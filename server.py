@@ -33,8 +33,8 @@ def make_app():
 async def create_camera_task():
     """Create task for camera."""
     predictor = create_model()
-    # camera = CameraOpenCV("src/video.mkv", True)
-    camera = CameraOpenCV("../conveer.mp4", True)
+    camera = CameraOpenCV("src/video.mp4", True)
+    # camera = CameraOpenCV("../conveer.mp4", True)
     wrapper = WebSocketCameraWrapper(
         camera=camera,
         socket=BaseWebSocket,

@@ -1,6 +1,7 @@
 
 import base64
 from abc import ABC
+from functools import reduce
 from typing import Any, Callable, Generator, Type
 
 import cv2
@@ -85,3 +86,32 @@ class FrameEncoders:
         """Encode image in base64 string with jpeg compression."""
         jpg_img = cv2.imencode('.jpg', frame)
         return base64.b64encode(jpg_img[1]).decode('utf-8')
+
+
+def _apply(arg: Any, func: Callable) -> Any:
+    """Apply function to argument and return result."""
+    return func(arg)
+
+
+class FrameHandlers:
+    """Class with few basic handlers for frame."""
+
+    @staticmethod
+    def resizer(
+        width: int,
+        height: int,
+        **kwargs: Any,
+    ) -> Callable[[np.ndarray], np.ndarray]:
+        """Create handler that resize image to desired size."""
+        def resize(frame: np.ndarray) -> np.ndarray:
+            return cv2.resize(frame, (width, height), **kwargs)
+        return resize
+
+    @staticmethod
+    def compress_handlers(
+        *handlers: Callable[[np.ndarray], np.ndarray],
+    ) -> Callable[[np.ndarray], np.ndarray]:
+        """Compress multiple handlers sequence in single call function."""
+        def compressed(frame: np.ndarray) -> np.ndarray:
+            return reduce(_apply, handlers, frame)
+        return compressed

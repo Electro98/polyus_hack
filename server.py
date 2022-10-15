@@ -2,16 +2,17 @@ import asyncio
 
 import tornado.web
 
-from camera import CameraOpenCV, FrameEncoders, WebSocketCameraWrapper
+from camera import (
+    CameraOpenCV,
+    FrameEncoders,
+    FrameHandlers,
+    WebSocketCameraWrapper,
+)
 from sockets import BaseWebSocket
+from request_handlers import MainHandler
 from utils import Periodic
 
 FRAMES_PER_SECOND = 60
-
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("index.html")
 
 
 def make_app():
@@ -24,6 +25,7 @@ def make_app():
         websocket_ping_interval=10,
         websocket_ping_timeout=30,
         template_path="templates/",
+        static_path="static/",
     )
 
 
@@ -33,7 +35,7 @@ async def create_camera_task():
     wrapper = WebSocketCameraWrapper(
         camera=camera,
         socket=BaseWebSocket,
-        frame_handler=None,
+        frame_handler=FrameHandlers.resizer(1280, 720),
         frame_encoder=FrameEncoders.jpeg_base64,
     )
     task_period = 1 / FRAMES_PER_SECOND

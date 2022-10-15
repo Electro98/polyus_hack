@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>SocketIO example</title>
-      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-      <script type="text/javascript">
-         $(document).ready(function() {
-         
-            var ws = new WebSocket("ws://localhost:8888/websocket/");
-            // ws.binaryType = 'arraybuffer';
-            // ws.onopen = function() {
-            //     ws.send("Hello, world");
-            // };
-            ws.onmessage = function (evt) {
-                $('#video').attr('src', `data:image/jpeg;base64,${evt.data}`);
-            };
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SocketIO example</title>
+    <script src="{{ static_url('js/plotly-latest.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
 
-         });
-      </script>
-   </head>
-   <body>
-    <h1>SocketIO Example</h1>
-    <h2>Receive:</h2>
-    <div id="log"></div>
-    <img id="video" src="">
-   </body>
+        var ws = new WebSocket("ws://localhost:8888/websocket/");
+        // ws.binaryType = 'arraybuffer';
+        // ws.onopen = function() {
+        //     ws.send("Hello, world");
+        // };
+        ws.onmessage = function (evt) {
+          $('#video').attr('src', `data:image/jpeg;base64,${evt.data}`);
+        };
+
+      });
+    </script>
+    <link href="{{ static_url('css/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  </head>
+  <body>
+    <h1 class="text-center">Demo</h1>
+    <main class="container">
+      <div class="row">
+        <div class="col-5 text-center align-self-center">
+          <h3>Video Stream</h3>
+          <img id="video" src="" class="col-12">
+        </div>
+        <div class="col-7">
+          <div class="chart" id="bargraph">
+            <script>
+              var graphs = {% raw plot %};
+              Plotly.plot('bargraph', graphs, {});
+            </script>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="{{ static_url('js/bootstrap.bundle.min.js') }}" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  </body>
 </html>

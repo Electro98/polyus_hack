@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from calculations import count_size
 
 from config import *
 
@@ -20,17 +21,19 @@ def get_model_instance_segmentation(num_classes):
     return model
 
 
-def create_model(model_path: str = MODEL_PATH, treshold: float = THRESHOLD) -> Callable[[np.ndarray], np.ndarray]:
+def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> Callable[[np.ndarray], np.ndarray]:
     """Загружает модель для детектирования негабарита."""
 
     if not torch.cuda.is_available():
         raise RuntimeError("cuda is not available now")
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    # device = torch.device('cpu')
 
     num_classes = 2
-    model = get_model_instance_segmentation(num_classes)
 
+    model = get_model_instance_segmentation(num_classes)
+    # model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     try:
         model.load_state_dict(torch.load(model_path))
         print("model loaded successfully")
@@ -59,18 +62,25 @@ def create_model(model_path: str = MODEL_PATH, treshold: float = THRESHOLD) -> C
             if len(outputs[0]['boxes']) != 0:
                 boxes = outputs[0]['boxes'].data.numpy()
                 scores = outputs[0]['scores'].data.numpy()
-                boxes = boxes[scores >= treshold].astype(np.int32)
+                boxes = boxes[scores >= threshold].astype(np.int32)
                 draw_boxes = boxes.copy()
 
                 for box in draw_boxes:
-                    cv2.rectangle(frame,
-                                (int(box[0]), int(box[1])),
-                                (int(box[2]), int(box[3])),
-                                (0, 0, 255), 3)
-                    cv2.putText(frame, 'stone',
-                                (int(box[0]), int(box[1]-5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255),
-                                2, lineType=cv2.LINE_AA)
+                    # Возможно нужно будет реализовать подсчёт через определенные промежутки времени
+                    # чтобы куски руды не засчитывались несколько раз
+                    ore_size = count_size(box)
+                    # Распределение по графикам
+                    if ore_size > OVERSIZE:
+                        # Отрисовка только негабаритов
+                        cv2.rectangle(frame,
+                                      (int(box[0]), int(box[1])),
+                                      (int(box[2]), int(box[3])),
+                                      (0, 0, 255), 3)
+                        cv2.putText(frame, 'stone',
+                                    (int(box[0]), int(box[1] - 5)),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255),
+                                    2, lineType=cv2.LINE_AA)
                 return frame
             return frame
+
     return predictor

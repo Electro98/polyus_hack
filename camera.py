@@ -108,6 +108,12 @@ class FrameHandlers:
         return resize
 
     @staticmethod
+    def filter(n=3):
+        def _filter(frame):
+            return cv2.medianBlur(frame, n)
+        return _filter
+
+    @staticmethod
     def compress_handlers(
         *handlers: Callable[[np.ndarray], np.ndarray],
     ) -> Callable[[np.ndarray], np.ndarray]:

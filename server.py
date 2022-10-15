@@ -12,6 +12,8 @@ from sockets import BaseWebSocket
 from request_handlers import MainHandler
 from utils import Periodic
 
+from main import create_model
+
 FRAMES_PER_SECOND = 60
 
 
@@ -31,11 +33,16 @@ def make_app():
 
 async def create_camera_task():
     """Create task for camera."""
-    camera = CameraOpenCV("src/video.mkv", True)
+    predictor = create_model()
+    # camera = CameraOpenCV("src/video.mkv", True)
+    camera = CameraOpenCV("../conveer.mp4", True)
     wrapper = WebSocketCameraWrapper(
         camera=camera,
         socket=BaseWebSocket,
-        frame_handler=FrameHandlers.resizer(1280, 720),
+        frame_handler=FrameHandlers.compress_handlers(
+            FrameHandlers.resizer(1280, 720),
+            predictor,
+        ),
         frame_encoder=FrameEncoders.jpeg_base64,
     )
     task_period = 1 / FRAMES_PER_SECOND

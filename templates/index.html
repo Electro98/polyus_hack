@@ -7,36 +7,50 @@
     <script src="{{ static_url('js/plotly-latest.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script type="text/javascript">
+      function update_video(data) {
+        document.getElementById("video").src = `data:image/jpeg;base64,${data}`;
+      }
+
       $(document).ready(function() {
 
         var ws = new WebSocket("ws://localhost:8888/websocket/");
-        // ws.binaryType = 'arraybuffer';
+        ws.binaryType = 'arraybuffer';
         // ws.onopen = function() {
         //     ws.send("Hello, world");
         // };
         ws.onmessage = function (evt) {
-          $('#video').attr('src', `data:image/jpeg;base64,${evt.data}`);
+          var type = typeof(evt.data);
+
+          if (type === "string" && evt.data.substr(0, 2) === "{\"") {
+            // This is json, probably
+            var data = JSON.parse(evt.data);
+            console.log(data);
+          } else if (type === "string") {
+            // This is frame in base64
+            update_video(evt.data);
+          } else {
+            // This is binary data
+            console.log(evt.data);
+          }
         };
 
       });
     </script>
     <link href="{{ static_url('css/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   </head>
-  <body>
-    <h1 class="text-center">Demo</h1>
-    <main class="container">
-      <div class="row">
-        <div class="col-5 text-center align-self-center">
-          <h3>Video Stream</h3>
-          <img id="video" src="" class="col-12">
-        </div>
-        <div class="col-7">
-          <div class="chart" id="bargraph">
-            <script>
-              var graphs = {% raw plot %};
-              Plotly.plot('bargraph', graphs, {});
-            </script>
-          </div>
+  <body class="container">
+    <h1 class="col-12 text-center">Demo</h1>
+    <main class="row">
+      <div class="col-12 text-center align-self-center">
+        <h3>Video Stream</h3>
+        <img id="video" src="" class="col-12">
+      </div>
+      <div class="col-12">
+        <div class="chart" id="bargraph">
+          <script>
+            var graphs = {% raw plot %};
+            Plotly.plot('bargraph', graphs, {});
+          </script>
         </div>
       </div>
     </main>

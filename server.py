@@ -10,7 +10,7 @@ from camera import (
 )
 from models import create_model
 from request_handlers import MainHandler
-from sockets import BaseWebSocket
+from sockets import BidirectionalSocket
 from utils import Periodic
 
 FRAMES_PER_SECOND = 60
@@ -21,7 +21,7 @@ def make_app():
     return tornado.web.Application(
         [
             (r"/", MainHandler),
-            (r"/websocket/", BaseWebSocket),
+            (r"/websocket/", BidirectionalSocket),
         ],
         websocket_ping_interval=10,
         websocket_ping_timeout=30,
@@ -37,7 +37,7 @@ async def create_camera_task():
     # camera = CameraOpenCV("../conveer.mp4", True)
     wrapper = WebSocketCameraWrapper(
         camera=camera,
-        socket=BaseWebSocket,
+        socket=BidirectionalSocket,
         frame_handler=FrameHandlers.compress_handlers(
             FrameHandlers.resizer(1280, 720),
             predictor,

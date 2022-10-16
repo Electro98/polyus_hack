@@ -8,6 +8,7 @@ import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from calculations import count_size
+from sockets import BidirectionalSocket
 
 from config import *
 
@@ -15,7 +16,7 @@ from config import *
 def get_model_instance_segmentation(num_classes):
     """Созданий модели."""
 
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=None)
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     return model
@@ -23,6 +24,8 @@ def get_model_instance_segmentation(num_classes):
 
 def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> Callable[[np.ndarray], np.ndarray]:
     """Загружает модель для детектирования негабарита."""
+
+    BidirectionalSocket.oversize_rock = threshold
 
     if not torch.cuda.is_available():
         raise RuntimeError("cuda is not available now")
@@ -75,7 +78,7 @@ def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> 
 
                     # Распределение по графикам
                     # print(ore_size)
-                    if ore_size > OVERSIZE:
+                    if ore_size > BidirectionalSocket.oversize_rock:
                         # Отрисовка только негабаритов
                         cv2.rectangle(frame,
                                       (box[0], box[1]),

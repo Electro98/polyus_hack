@@ -34,3 +34,14 @@ class BaseWebSocket(tornado.websocket.WebSocketHandler):
         return True
         # parsed_origin = urllib.parse.urlparse(origin)
         # return parsed_origin.netloc.endswith(".mydomain.com")
+
+
+class BidirectionalSocket(BaseWebSocket):
+    oversize_rock = 200
+
+    def on_message(self, message):
+        """Message handler stub."""
+        try:
+            self.__class__.oversize_rock = int(message)
+        except:
+            pass

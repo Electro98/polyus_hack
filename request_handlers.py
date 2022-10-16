@@ -1,5 +1,4 @@
 
-from math import sin
 from typing import Any
 
 import tornado.web
@@ -17,8 +16,8 @@ class MainHandler(tornado.web.RequestHandler):
         x_data = []
         graph.add_trace(graph_objs.Histogram(x=x_data, xbins={"size": 3}))
         graph.update_layout(
-            title="График",
-            xaxis_title="X",
-            yaxis_title="Y",
+            title="Распределение руды",
+            xaxis_title="Размер в миллиметрах",
+            yaxis_title="Частота",
         )
         return {"plot": to_json(graph)}

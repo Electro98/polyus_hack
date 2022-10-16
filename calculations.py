@@ -1,4 +1,5 @@
-from config import *
+from numba import njit
+from config import DISTANCE_COEF
 
 LINE_WIDTH_MM = 1600
 LINE_WIDTH = 915
@@ -7,6 +8,7 @@ SECOND_EDGE = 404
 THIRD_EDGE = 351
 
 
+@njit
 def count_size(box):
     x_left = int(box[0])
     y_left = int(box[1])
@@ -27,4 +29,4 @@ def count_size(box):
         return max(width_mm, length_mm) * DISTANCE_COEF
     elif SECOND_EDGE < y_right < THIRD_EDGE:
         return max(width_mm, length_mm) * (DISTANCE_COEF ** 2)
-    #   (639, 663) (686, 720)
+    return 0

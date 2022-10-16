@@ -11,6 +11,13 @@
         document.getElementById("video").src = `data:image/jpeg;base64,${data}`;
       }
 
+      function graphs(data) {
+        Plotly.extendTraces('bargraph', {
+          y: [[data["y"]]], 
+          x: [[date["x"]]]
+        }, [0])
+      }
+
       $(document).ready(function() {
 
         var ws = new WebSocket("ws://localhost:8888/websocket/");

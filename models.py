@@ -15,7 +15,7 @@ from config import *
 def get_model_instance_segmentation(num_classes):
     """Созданий модели."""
 
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=None)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None)
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     return model
@@ -64,12 +64,15 @@ def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> 
                 scores = outputs[0]['scores'].data.numpy()
                 boxes = boxes[scores >= threshold].astype(np.int32)
                 draw_boxes = boxes.copy()
-
+                ore_sizes = []
                 for box in draw_boxes:
                     # Возможно нужно будет реализовать подсчёт через определенные промежутки времени
                     # чтобы куски руды не засчитывались несколько раз
                     # print(box)
                     ore_size = count_size(tuple(box))
+                    if ore_size != 0:
+                        ore_sizes.append(ore_size)
+
                     # Распределение по графикам
                     # print(ore_size)
                     if ore_size > OVERSIZE:
@@ -82,7 +85,7 @@ def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> 
                                     (int(box[0]), int(box[1] - 5)),
                                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255),
                                     2, lineType=cv2.LINE_AA)
-                return frame
-            return frame
+                return frame, ore_sizes
+            return frame, []
 
     return predictor

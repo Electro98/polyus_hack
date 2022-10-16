@@ -11,10 +11,9 @@
         document.getElementById("video").src = `data:image/jpeg;base64,${data}`;
       }
 
-      function graphs(data) {
-        Plotly.extendTraces('bargraph', {
-          y: [[data["y"]]], 
-          x: [[date["x"]]]
+      function graphExtend(data) {
+        Plotly.extendTraces('bargraph', { 
+          x: [data]
         }, [0])
       }
 
@@ -31,6 +30,7 @@
           if (type === "string" && evt.data.substr(0, 2) === "{\"") {
             // This is json, probably
             var data = JSON.parse(evt.data);
+            graphExtend(data.data);
             console.log(data);
           } else if (type === "string") {
             // This is frame in base64

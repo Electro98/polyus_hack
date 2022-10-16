@@ -14,9 +14,8 @@ class MainHandler(tornado.web.RequestHandler):
 
     def prepare_plot_data(self) -> dict[str, Any]:
         graph = graph_objs.Figure()
-        x_data = list(range(-100, 100))
-        y_data = list(map(lambda x: sin(x / 2), x_data))
-        graph.add_trace(graph_objs.Scatter(x=x_data, y=y_data))
+        x_data = []
+        graph.add_trace(graph_objs.Histogram(x=x_data, xbins={"size": 3}))
         graph.update_layout(
             title="График",
             xaxis_title="X",

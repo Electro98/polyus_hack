@@ -69,7 +69,8 @@ class WebSocketCameraWrapper:
 
         def task():
             new_frame = next(frame_iterator)
-            processed_frame = self.frame_handler(new_frame)
+            processed_frame, data = self.frame_handler(new_frame)
+            self.socket.send_message({'data': data})
             prepared_data = self.frame_encoder(processed_frame)
             self.socket.send_message(
                 prepared_data,

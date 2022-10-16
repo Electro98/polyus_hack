@@ -11,7 +11,7 @@ class Singleton(type):
 
 class LikeDB(metaclass=Singleton):
     def __init__(self) -> None:
-        self._deque = deque(maxlen=60)
+        self._deque = deque(maxlen=300)
 
     def put(self, item):
         self._deque.append(item)

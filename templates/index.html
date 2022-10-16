@@ -18,7 +18,8 @@
       }
 
       function play_notification() {
-        var audio = new Audio("{{ static_url('cool_not.mp3') }}");
+        // var audio = new Audio("{{ static_url('cool_not.mp3') }}");
+        var audio = new Audio("static/cool_not.mp3");
         audio.loop = false;
         audio.play(); 
       }
@@ -26,12 +27,15 @@
       var max_size = 200;
 
       function alert_big_rock(data) {
+        var found = false;
         for (let index = 0; index < data.length; index++) {
           const element = data[index];
           if (element > max_size) {
-            play_notification();
+            found = true;
           }
         }
+        if (found)
+          play_notification();
       }
 
       $(document).ready(function() {
@@ -48,7 +52,6 @@
             // This is json, probably
             var data = JSON.parse(evt.data);
             graphExtend(data.data);
-            console.log(data);
           } else if (type === "string") {
             // This is frame in base64
             update_video(evt.data);

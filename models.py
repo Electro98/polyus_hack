@@ -11,6 +11,7 @@ from calculations import count_size
 from sockets import BidirectionalSocket
 
 from config import *
+from db_stub import LikeDB
 
 
 def get_model_instance_segmentation(num_classes):
@@ -54,6 +55,8 @@ def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> 
 
     cpu_device = torch.device("cpu")
 
+    db = LikeDB()
+
     def predictor(frame: np.ndarray) -> np.ndarray:
         with torch.no_grad():
             image = get_transform(image=frame)["image"].to(device)
@@ -88,6 +91,8 @@ def create_model(model_path: str = MODEL_PATH, threshold: float = THRESHOLD) -> 
                                     (int(box[0]), int(box[1] - 5)),
                                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255),
                                     2, lineType=cv2.LINE_AA)
+
+                db.put(ore_sizes)
                 return frame, ore_sizes
             return frame, []
 
